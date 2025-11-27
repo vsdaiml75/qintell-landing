@@ -1,5 +1,77 @@
 import React from "react";
+import { useState } from "react";
 import QintellScenarioFlow from "./components/QintellScenarioFlow";
+
+const FlippableCard: React.FC<{
+  title: string;
+  children: React.ReactNode;
+}> = ({ title, children }) => {
+  const [flipped, setFlipped] = useState(false);
+  const toggle = () => setFlipped((s) => !s);
+  const onKey = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      toggle();
+    }
+  };
+
+  return (
+    <div
+      className="cursor-pointer focus:outline-none"
+      role="button"
+      tabIndex={0}
+      aria-pressed={flipped}
+      aria-label={`Toggle ${title} details`}
+      onMouseEnter={() => setFlipped(true)}
+      onMouseLeave={() => setFlipped(false)}
+      onFocus={() => setFlipped(true)}
+      onBlur={() => setFlipped(false)}
+      onKeyDown={onKey}
+      style={{ perspective: 1000 }}
+    >
+      <div
+        style={{
+          transition: "transform 0.6s cubic-bezier(.2,.8,.2,1)",
+          transformStyle: "preserve-3d",
+          transform: flipped ? "rotateY(180deg)" : "rotateY(0deg)",
+        }}
+        className="relative h-44 md:h-52 lg:h-56"
+      >
+        {/* FRONT */}
+        <div
+          className="rounded-3xl border border-cyan-500/30 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-6 h-full flex items-center justify-center relative shadow-md transition-transform duration-200 ease-out hover:scale-105 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-cyan-400"
+          style={{ backfaceVisibility: "hidden", WebkitBackfaceVisibility: "hidden" }}
+        >
+          <div className="absolute top-4 right-4 text-xs text-slate-400 z-10">Tap / Hover</div>
+          <div className="w-full flex items-center justify-center">
+            <div className="text-base md:text-lg font-semibold text-slate-50 truncate" style={{textShadow: '0 1px 4px rgba(0,0,0,0.12)'}}>
+              {title}
+            </div>
+          </div>
+        </div>
+
+        {/* BACK */}
+        <div
+          className="rounded-3xl border border-cyan-500/30 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-5 h-full absolute inset-0 overflow-hidden shadow-md transition-transform duration-200 ease-out"
+          style={{
+            transform: "rotateY(180deg)",
+            backfaceVisibility: "hidden",
+            WebkitBackfaceVisibility: "hidden",
+          }}
+        >
+          <div className="flex items-start justify-between w-full mb-2">
+            <div className="text-sm md:text-base font-semibold text-slate-50" style={{textShadow: '0 1px 4px rgba(0,0,0,0.12)'}}>{title}</div>
+            <div className="text-xs text-slate-400">Move away to close</div>
+          </div>
+          <div className="border-t border-slate-800 mb-2"></div>
+          <div className="text-xs md:text-sm text-slate-200 leading-snug space-y-1">
+            {children}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 // ------------------------------------------------------
 // MAIN LANDING PAGE
@@ -10,25 +82,31 @@ const QintellLanding: React.FC = () => {
 
       {/* NAVBAR */}
       <header className="border-b border-slate-800/80 bg-slate-950/90 backdrop-blur">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-6 px-6 py-4">
-
-          {/* Logo */}
-          <div className="flex items-center gap-2 shrink-0">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-cyan-500/20 ring-1 ring-cyan-400/50">
-              <span className="text-xl font-semibold text-cyan-300">q</span>
+        <div className="mx-auto flex  max-w-[1600px] items-center justify-between gap-6 px-6 py-5">
+          {/* Brand block: logo + wordmark + triad */}
+          <div className="flex items-center gap-3 shrink-0">
+            <div className="flex items-center justify-center h-12 w-12 md:h-16 md:w-16 animate-fadein">
+              <img
+                src="././logo.png"
+                alt="qintell logo"
+                className="h-9 w-9 md:h-12 md:w-12 rounded-lg animate-fadein"
+                
+              />
             </div>
-            <div className="leading-tight">
-              <div className="text-sm font-semibold tracking-tight text-slate-50">
+            <div className="flex flex-col leading-tight">
+              <span className="text-sm font-bold tracking-tight text-slate-50 md:text-xl">
                 qintell
-              </div>
-              <div className="text-xs text-slate-400">
-                Req &amp; Test Intelligence
-              </div>
+              </span>
+              <span className="hidden text-base font-bold tracking-tight text-gray-400 md:inline animate-pulse
+                                style={{ animation: slow-pulse 8s ease-in-out infinite
+                                        }}">
+                Structure · Clarity · Confidence
+              </span>
             </div>
           </div>
 
           {/* Nav Links */}
-          <nav className="hidden flex-1 items-center justify-center gap-6 text-sm font-medium text-slate-300 md:flex">
+          <nav className="hidden flex-1 items-center justify-center gap-6 text-lg font-medium text-gray-300 md:flex">
             <a href="#scenario" className="hover:text-cyan-300">
               Scenario Walkthrough
             </a>
@@ -59,7 +137,7 @@ const QintellLanding: React.FC = () => {
       </header>
 
       {/* MAIN CONTENT */}
-      <main className="mx-auto max-w-7xl px-6 pb-20 pt-10">
+      <main className="mx-auto max-w-[1600px] px-6 pb-20 pt-10">
 
         {/* ------------------------------------------------------ */}
         {/* SCENARIO-DRIVEN INTERACTIVE HERO                      */}
@@ -108,53 +186,55 @@ const QintellLanding: React.FC = () => {
           </div>
         </section>
 
-        {/* ------------------------------------------------------ */}
-        {/* DOMAIN ASSETS (unchanged)                              */}
+                {/* ------------------------------------------------------ */}
+        {/* QINTELL KNOWLEDGE GRAPH                               */}
         {/* ------------------------------------------------------ */}
         <section id="domain-assets" className="mt-20 border-t border-slate-800/80 pt-12">
-          <h2 className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
-            Foundation
+          <h2 className="text-lg font-bold uppercase tracking-[0.2em] text-gray-400 font-serif">
+            Qintell Knowledge Graph
           </h2>
-          <p className="mt-2 text-2xl font-semibold text-slate-50 sm:text-3xl">
-            Domain intelligence, built in from day one.
+          <p className="mt-2 text-sm font-medium text-slate-50 sm:text-2xl">
+            A structured model of how real banking systems work.
           </p>
-          <p className="mt-3 max-w-2xl text-base text-slate-200">
-            Qintell includes curated domain libraries that strengthen interpretation,
-            scenario generation and coverage understanding across real banking and payments delivery.
+          <p className="mt-3 max-w-full text-base text-slate-200">
+            Qintell maintains a connected graph of flows, entities, rules, validations, exceptions, controls and scenario patterns.<br />
+            This strengthens how your requirements are interpreted, how scenarios are proposed and how coverage is viewed.
           </p>
 
+          
+          
+          
+          
           <div className="mt-7 grid gap-6 md:grid-cols-3">
-            <div className="rounded-2xl border border-slate-800 bg-slate-950/80 p-6">
-              <div className="text-base font-semibold text-slate-50">Payments &amp; Corporate Banking</div>
-              <ul className="mt-3 space-y-1 text-base text-slate-200">
-                <li>• ACH/NACHA, Fedwire, SEPA, PSD2</li>
-                <li>• IMPS/UPI, RTGS variants</li>
-                <li>• Limits, returns, exceptions</li>
-                <li>• Cash management & liquidity flows</li>
+            <FlippableCard title="Functional models">
+              <ul className="mt-1 space-y-1 text-base text-slate-200">
+                <li>• Core business flows and state transitions</li>
+                <li>• Entities, life-cycles and relationships</li>
+                <li>• Rules, validations and exception pathways</li>
+                <li>• Cross-channel journey structures</li>
               </ul>
-            </div>
+            </FlippableCard>
 
-            <div className="rounded-2xl border border-slate-800 bg-slate-950/80 p-6">
-              <div className="text-base font-semibold text-slate-50">BRM &amp; Channels</div>
-              <ul className="mt-3 space-y-1 text-base text-slate-200">
-                <li>• Billing, rating, invoicing</li>
-                <li>• Adjustments, dunning</li>
-                <li>• Revenue protection controls</li>
-                <li>• Channel journeys & entitlements</li>
+            <FlippableCard title="Scenario & coverage intelligence">
+              <ul className="mt-1 space-y-1 text-base text-slate-200">
+                <li>• Scenario templates for common banking interactions</li>
+                <li>• Positive, negative and edge-condition patterns</li>
+                <li>• Coverage heuristics for flows, rules and controls</li>
+                <li>• Failure-mode insights reusable across projects</li>
               </ul>
-            </div>
+            </FlippableCard>
 
-            <div className="rounded-2xl border border-slate-800 bg-slate-950/80 p-6">
-              <div className="text-base font-semibold text-slate-50">Reference Intelligence</div>
-              <ul className="mt-3 space-y-1 text-base text-slate-200">
-                <li>• NACHA, ISO 20022-aligned elements</li>
-                <li>• Domain glossaries & dictionaries</li>
-                <li>• Coverage maps across key flows</li>
-                <li>• QE accelerators and trace patterns</li>
+            <FlippableCard title="Reference & consistency layer">
+              <ul className="mt-1 space-y-1 text-base text-slate-200">
+                <li>• Standardized terminology and definitions</li>
+                <li>• Alignment to regulatory concepts where applicable</li>
+                <li>• Mappings that connect requirements to functional context</li>
+                <li>• Structures that keep teams consistent as scope evolves</li>
               </ul>
-            </div>
+            </FlippableCard>
           </div>
         </section>
+
 
         {/* ------------------------------------------------------ */}
         {/* REQUIREMENT INTELLIGENCE (unchanged)                   */}
@@ -331,7 +411,7 @@ const QintellLanding: React.FC = () => {
 
       {/* FOOTER */}
       <footer className="border-t border-slate-800/80 bg-slate-950/95">
-        <div className="mx-auto flex max-w-7xl flex-col gap-3 px-6 py-5 text-xs text-slate-500 sm:flex-row sm:items-center sm:justify-between">
+        <div className="mx-auto flex max-w-[1600px] flex-col gap-3 px-6 py-5 text-xs text-slate-500 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-2">
             <span className="text-sm font-semibold text-slate-200">qintell</span>
             <span className="text-xs text-slate-500">
@@ -354,3 +434,4 @@ const QintellLanding: React.FC = () => {
 };
 
 export default QintellLanding;
+
